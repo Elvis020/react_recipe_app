@@ -1,10 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import RecipeEdit from './RecipeEdit';
 import RecipeList from './RecipeList';
 import '../css/app.css';
 import uuidv4 from 'uuid/v4';
+const LOCAL__STORAGE__KEY = 'cookingWithReact.recipes';
+
+
+// This initializes the context to be used
+export const RecipeContext = React.createContext();
 
 function App() {
   const [recipes, setRecipes] = useState(sampleList);
+
+  useEffect(() => {
+    const arrayRecipes = localStorage.getItem(LOCAL__STORAGE__KEY);
+    if(arrayRecipes != null) setRecipes(JSON.parse(arrayRecipes));
+  }, [])
+
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL__STORAGE__KEY, JSON.stringify(recipes));
+  }, [recipes])
+
 
   // Function to add new Recipe
   const addRecipeHandler = () => {
@@ -26,22 +43,20 @@ function App() {
     setRecipes([newRecipe, ...recipes]);
   };
 
-
   // Function to delete a recipe
   const delRecipe = (id) => {
-    setRecipes(recipes.filter(recipe => recipe.id !== id))
-  }
+    setRecipes(recipes.filter((recipe) => recipe.id !== id));
+  };
+
+  // Adding the functions to be used as context this shoud be done after initialization of the functions
+  const RecipeContextValue = { addRecipeHandler, delRecipe };
 
   return (
-    <div>
-      <RecipeList
-        delRecipe={delRecipe}
-        addRecipeHandler={addRecipeHandler}
-        recipes={recipes}
-      />
-    </div>
+    <RecipeContext.Provider value={RecipeContextValue}>
+      <RecipeList recipes={recipes} />
+      <RecipeEdit />
+    </RecipeContext.Provider>
   );
-  
 }
 
 const sampleList = [
