@@ -11,6 +11,10 @@ export const RecipeContext = React.createContext();
 
 function App() {
   const [recipes, setRecipes] = useState(sampleList);
+  const [selectedRecipeId, setSelectedRecipeId] = useState();
+
+  // Finding a specific recipe
+  const selectedRecipe = recipes.find(recipe => recipe.id === selectedRecipeId );
 
   useEffect(() => {
     const arrayRecipes = localStorage.getItem(LOCAL__STORAGE__KEY);
@@ -27,34 +31,55 @@ function App() {
   const addRecipeHandler = () => {
     const newRecipe = {
       id: uuidv4(),
-      name: "New ...",
-      servings: 1,
-      cookTime: "1:00am",
-      instructions: "Instruc.",
+      name: "",
+      servings: "",
+      cookTime: "",
+      instructions: "",
       ingredients: [
         {
           id: uuidv4(),
-          name: "Name",
-          amount: "1 Tbs",
+          name: "",
+          amount: "",
         },
       ],
     };
-
+    setSelectedRecipeId(newRecipe.id);
     setRecipes([newRecipe, ...recipes]);
   };
 
   // Function to delete a recipe
   const delRecipe = (id) => {
+      if (selectedRecipeId != null && selectedRecipeId === id) {
+        return setSelectedRecipeId(undefined);
+      }
     setRecipes(recipes.filter((recipe) => recipe.id !== id));
   };
 
+  // Function to handle selected Recipe
+  const handleSelectedRecipe = (id) => {
+    setSelectedRecipeId(id);
+  }
+
+  // Function to change values of the selected recipe(UPDATING RECIPE)
+  const handleEditRecipe =(id, recipe) => {
+    const newRecipes = [...recipes];
+    const index = newRecipes.findIndex(r => r.id === id);
+    // Swapping old recipe with new recipe
+    newRecipes[index] = recipe;
+    // Adding new recipe to array of recipes
+    setRecipes(newRecipes)
+
+  }
+
   // Adding the functions to be used as context this shoud be done after initialization of the functions
-  const RecipeContextValue = { addRecipeHandler, delRecipe };
+  const RecipeContextValue = { addRecipeHandler, delRecipe, handleSelectedRecipe, handleEditRecipe };
 
   return (
     <RecipeContext.Provider value={RecipeContextValue}>
       <RecipeList recipes={recipes} />
-      <RecipeEdit />
+
+      {/* Checking whether selected recipe is null */}
+      {selectedRecipe ? <RecipeEdit recipe={selectedRecipe} selectedRecipe /> : ""}
     </RecipeContext.Provider>
   );
 }

@@ -11,14 +11,15 @@ export default function Recipe({
   instructions,
   ingredients,
 }) {
+  const { delRecipe, handleSelectedRecipe } = useContext(RecipeContext);
 
-  const { delRecipe } = useContext(RecipeContext);
+
   return (
     <div className="recipe">
       <div className="recipe__header">
         <h3 className="recipe__title"> {name}</h3>
         <div>
-          <button className="btn btn--primary mr-1">Edit</button>
+          <button onClick={() => handleSelectedRecipe(id)} className="btn btn--primary mr-1">Edit</button>
           <button onClick={() => delRecipe(id)} className="btn btn--danger">
             Delete
           </button>
