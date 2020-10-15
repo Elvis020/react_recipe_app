@@ -1,14 +1,47 @@
 import React, { useState } from 'react';
 import RecipeList from './RecipeList';
-import '../css/app.css'
+import '../css/app.css';
+import uuidv4 from 'uuid/v4';
 
 function App() {
   const [recipes, setRecipes] = useState(sampleList);
+
+  // Function to add new Recipe
+  const addRecipeHandler = () => {
+    const newRecipe = {
+      id: uuidv4(),
+      name: "New ...",
+      servings: 1,
+      cookTime: "1:00am",
+      instructions: "Instruc.",
+      ingredients: [
+        {
+          id: uuidv4(),
+          name: "Name",
+          amount: "1 Tbs",
+        },
+      ],
+    };
+
+    setRecipes([newRecipe, ...recipes]);
+  };
+
+
+  // Function to delete a recipe
+  const delRecipe = (id) => {
+    setRecipes(recipes.filter(recipe => recipe.id !== id))
+  }
+
   return (
     <div>
-      <RecipeList recipes={recipes} />
+      <RecipeList
+        delRecipe={delRecipe}
+        addRecipeHandler={addRecipeHandler}
+        recipes={recipes}
+      />
     </div>
   );
+  
 }
 
 const sampleList = [
